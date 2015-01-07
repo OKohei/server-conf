@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu1410"
+  config.vm.box = "ubuntu1404"
 
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
@@ -32,7 +32,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  # config.ssh.forward_agent = true
+  config.ssh.forward_agent = false
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -46,7 +46,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.provider :virtualbox do |vb|
   #   # Don't boot with headless mode
-  #   vb.gui = true
+    vb.gui = true
   #
   #   # Use VBoxManage to customize the VM. For example to change memory:
     vb.customize ["modifyvm", :id, "--memory", "1024"]
@@ -116,15 +116,19 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   #   chef.validation_client_name = "ORGNAME-validator"
   config.vm.provision :shell, inline: <<-EOT
-    cp /vagrant/sunrise-server-conf/timezone /etc/
+    mkdir -p /home/ubuntu/storage/{cache,meta,logs,sessions,views}
+    mkdir -p /home/ubuntu/access
+    chmod -R 777 /home/
+    
+    cp /vagrant/server-conf/timezone /etc/
     dpkg-reconfigure -f noninteractive tzdata
 
     aptitude update
     aptitude -y install php5 php5-curl php5-gd php5-json php5-mcrypt php5-mysql language-pack-ja
     aptitude -y install apache2-utils mysql-client-core-5.5
 
-    cd /etc/php5/mods-available
-    ln -fs /etc/php5/conf.d/mcrypt.ini .
+    #cd /etc/php5/mods-available
+    #ln -fs /etc/php5/conf.d/mcrypt.ini .
     php5enmod mcrypt
 
     mkdir -p /usr/local/lib/php
@@ -137,10 +141,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     cd /var
     rm -rf www
     ln -fs /vagrant/sunrise-server/public www
-
-    cp /vagrant/sunrise-server-conf/apache2.conf /etc/apache2/
-    cp /vagrant/sunrise-server-conf/envvars /etc/apache2/
-    cp /vagrant/sunrise-server-conf/my.cnf /etc/mysql/
+    
+    cp /vagrant/server-conf/apache2.conf /etc/apache2/
+    cp /vagrant/server-conf/envvars /etc/apache2/
+    cp /vagrant/server-conf/my.cnf /etc/mysql/
 
     a2enmod php5
     a2enmod rewrite
@@ -148,9 +152,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     a2ensite default-ssl
     service apache2 restart
 
-    mkdir -p /home/sunrise-server/storage/{cache,meta,logs,sessions,views}
-    mkdir -p /home/sunrise-server/{access,ean,gmo}
-    chmod -R 777 /home/sunrise-server
 EOT
 end
 
