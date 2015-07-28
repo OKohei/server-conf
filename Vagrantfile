@@ -10,8 +10,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu1404"
-
+  config.vm.box = "ubuntu/trusty64"
+  # config.vm.boot_timeout = 200
+    
   # The url from where the 'config.vm.box' box will be fetched if it
   # doesn't already exist on the user's system.
   # config.vm.box_url = "http://domain.com/path/to/above.box"
@@ -32,8 +33,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # If true, then any SSH connections made will enable agent forwarding.
   # Default value: false
-  config.ssh.forward_agent = false
-
+  config.ssh.forward_agent = true 
+  config.ssh.insert_key = false 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
@@ -46,7 +47,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #
   config.vm.provider :virtualbox do |vb|
   #   # Don't boot with headless mode
-    vb.gui = true
+  # vb.gui = true
   #
   #   # Use VBoxManage to customize the VM. For example to change memory:
     vb.customize ["modifyvm", :id, "--memory", "1024"]
@@ -124,11 +125,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     dpkg-reconfigure -f noninteractive tzdata
 
     aptitude update
-    aptitude -y install php5 php5-curl php5-gd php5-json php5-mcrypt php5-mysql language-pack-ja
+    aptitude -y install php5 php5-curl php5-gd php5-json php5-mcrypt php5-mysql
     aptitude -y install apache2-utils mysql-client-core-5.5
-
-    #cd /etc/php5/mods-available
-    #ln -fs /etc/php5/conf.d/mcrypt.ini .
+    
     php5enmod mcrypt
 
     mkdir -p /usr/local/lib/php
